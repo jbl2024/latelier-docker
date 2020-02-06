@@ -20,7 +20,9 @@ RUN apk --no-cache --virtual .node-gyp-compilation-dependencies add \
 	# And runtime dependencies, which we keep
 	&& apk --no-cache add \
 		bash \
-		ca-certificates
+		ca-certificates \
+		file \
+		graphicsmagick
 
 # Copy in entrypoint
 COPY --from=0 $SCRIPTS_FOLDER $SCRIPTS_FOLDER/
