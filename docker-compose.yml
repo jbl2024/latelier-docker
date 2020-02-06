@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  app:
+  latelier:
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,13 +14,35 @@ services:
       ROOT_URL: ${APP_ROOT_URL:-http://localhost}
       MONGO_URL: mongodb://mongo:27017/meteor
       PORT: 3000
-
+      MAIL_URL: smtp://maildev:25
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      METEOR_SETTINGS: '{
+        "generateFixtures": false,
+        "disableAccountCreation": false,
+        "attachmentsPath": "/attachments",
+        "email": {
+          "from": "noreply@latelierdesprojets.fr",
+          "prefix": "[latelier]"
+        },
+        "roles": {
+          "admin": ["admin@latelierdesprojets.fr"]
+        }
+      }'
+    volumes:
+        - ./attachments:/attachments
+  
   mongo:
     image: mongo:latest
     command:
       - --storageEngine=wiredTiger
     volumes:
       - data:/data/db
+
+  maildev:
+    image: djfarrelly/maildev
+    ports:
+      - "1080:80"
+      - "1025:25"
 
 volumes:
   data:
