@@ -1,7 +1,8 @@
 # The tag here should match the Meteor version of your app, per .meteor/release
 FROM geoffreybooth/meteor-base:1.9
 
-RUN git clone https://github.com/jbl2024/latelier.git $APP_SOURCE_FOLDER
+RUN git clone https://github.com/jbl2024/latelier.git $APP_SOURCE_FOLDER \
+		&& cd $APP_SOURCE_FOLDER && git checkout ${LATELIER_VERSION}
 RUN bash $SCRIPTS_FOLDER/build-app-npm-dependencies.sh
 RUN METEOR_DISABLE_OPTIMISTIC_CACHING=1 bash $SCRIPTS_FOLDER/build-meteor-bundle.sh
 
