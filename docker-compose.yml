@@ -21,11 +21,11 @@ services:
         "disableAccountCreation": false,
         "attachmentsPath": "/attachments",
         "email": {
-          "from": "noreply@latelierdesprojets.fr",
+          "from": "noreply@localhost",
           "prefix": "[latelier]"
         },
         "roles": {
-          "admin": ["admin@latelierdesprojets.fr"]
+          "admin": ["admin@localhost"]
         }
       }'
     volumes:
@@ -37,6 +37,13 @@ services:
       - --storageEngine=wiredTiger
     volumes:
       - data:/data/db
+
+  mongoexpress:
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+    ports:
+      - "8081:8081"
 
   maildev:
     image: djfarrelly/maildev
