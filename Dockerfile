@@ -1,6 +1,6 @@
 # The tag here should match the Meteor version of your app, per .meteor/release
 FROM geoffreybooth/meteor-base:1.9
-
+ARG LATELIER_VERSION="v2.9.0"
 RUN git clone https://github.com/jbl2024/latelier.git $APP_SOURCE_FOLDER \
 		&& cd $APP_SOURCE_FOLDER && git checkout ${LATELIER_VERSION}
 RUN bash $SCRIPTS_FOLDER/build-app-npm-dependencies.sh

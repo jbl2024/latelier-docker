@@ -5,12 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        LATELIER_VERSION: v2.9.0
     ports:
       - '80:3000'
     depends_on:
       - mongo
     environment:
-      LATELIER_VERSION: v2.9.0
       ROOT_URL: ${APP_ROOT_URL:-http://localhost}
       MONGO_URL: mongodb://mongo:27017/meteor
       PORT: 3000
