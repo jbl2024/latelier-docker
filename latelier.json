@@ -1,0 +1,99 @@
+{
+  "captainVersion": "2",
+  "documentation": "Taken from https://github.com/jbl2024/latelier.",
+  "displayName": "L'atelier",
+  "description": "L'atelier, a project management tool",
+  "dockerCompose": {
+    "version": "3.3",
+    "services": {
+      "$$cap_appname-db": {
+        "dockerfileLines": [
+          "FROM mongo:$$cap_mongo_version",
+          "RUN touch /docker-entrypoint-initdb.d/init_db.js",
+          "RUN echo \"db.auth('$$cap_mongo_username-user', '$$cap_mongo_password-password'); db.createUser({user: '$$cap_mongo_username', pwd: '$$cap_mongo_password', roles:[{role:'dbOwner', db: '$$cap_mongo_database'}]});\" > /docker-entrypoint-initdb.d/init_db.js",
+          "CMD [\"mongod\"]"
+        ],
+        "notExposeAsWebApp": "true",
+        "volumes": [
+          "$$cap_appname-db-data:/data/db",
+          "$$cap_appname-db-config:/data/configdb"
+        ],
+        "restart": "always",
+        "environment": {
+          "MONGO_INITDB_ROOT_USERNAME": "$$cap_mongo_username",
+          "MONGO_INITDB_ROOT_PASSWORD": "$$cap_mongo_password",
+          "MONGO_INITDB_DATABASE": "$$cap_mongo_database"
+        }
+      },
+      "$$cap_appname": {
+        "depends_on": ["$$cap_appname-db"],
+        "image": "jbl2024/latelier:$$cap_latelier_version",
+        "containerHttpPort": "3000",
+        "volumes": ["$$cap_appname-data:/var/www/latelier/attachments"],
+        "restart": "always",
+        "environment": {
+          "ROOT_URL": "https://$$cap_appname.$$cap_root_domain",
+          "MONGO_URL": "mongodb://$$cap_mongo_username:$$cap_mongo_password@srv-captain--$$cap_appname-db/$$cap_mongo_database",
+          "MAIL_URL": "$$cap_latelier_mail_url",
+          "PORT": "3000",
+          "METEOR_SETTINGS": "{ \"generateFixtures\": false, \"disableAccountCreation\": false, \"attachmentsPath\": \"/attachments\", \"email\": { \"from\": \"noreply@localhost\", \"prefix\": \"[latelier]\" }, \"roles\": { \"admin\": [ \"admin@localhost\" ] } }"
+        }
+      }
+    },
+    "volumes": {
+      "db_data": {}
+    }
+  },
+  "instructions": {
+    "start": "L'atelier, a project management tool.",
+    "end": "L'atelier is deployed and available as $$cap_appname."
+  },
+  "variables": [
+    {
+      "id": "$$cap_mongo_version",
+      "label": "MongoDB Version",
+      "defaultValue": "4",
+      "description": "Check out their Docker page for the valid tags https://hub.docker.com/r/library/mongo/tags/",
+      "validRegex": "/^([^\\s^\\/])+$/"
+    },
+    {
+      "id": "$$cap_mongo_username",
+      "label": "MongoDB RootUsername",
+      "defaultValue": "root",
+      "description": "Only use alphanumeric chars.",
+      "validRegex": "/^([a-zA-Z0-9])+$/"
+    },
+    {
+      "id": "$$cap_mongo_database",
+      "label": "MongoDB database",
+      "defaultValue": "latelier",
+      "description": "Only use alphanumeric chars.",
+      "validRegex": "/^([a-zA-Z0-9])+$/"
+    },
+    {
+      "id": "$$cap_mongo_password",
+      "label": "MongoDB password",
+      "validRegex": "/^\\s*\\S.*$/"
+    },
+    {
+      "id": "$$cap_latelier_version",
+      "label": "L'atelier version",
+      "defaultValue": "latest",
+      "description": "Check out their Docker page for the valid tags https://hub.docker.com/r/jbl2024/latelier/tags",
+      "validRegex": "/^([^\\s^\\/])+$/"
+    },
+    {
+      "id": "$$cap_latelier_admin_user",
+      "label": "Admin user",
+      "defaultValue": "user@localhost",
+      "description": "User will have admin rights (container must be restarted to apply)",
+      "validRegex": "/^([^\\s^\\/])+$/"
+    },
+    {
+      "id": "$$cap_latelier_mail_url",
+      "label": "Mail url",
+      "defaultValue": "smtp://localhost:1025",
+      "description": "Mail url. Example: smtp://localhost:1025"
+    }
+  ]
+}
